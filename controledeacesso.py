@@ -1,30 +1,62 @@
-class ControleAcesso:
-    def __init__(self, inicio_memoria, fim_memoria, tamanho_dados):
-        self.inicio_memoria = 10
+class ControleAcessoRFID:
+    def __init__(self):
+        self.inicio_memoria = 100
         self.fim_memoria = 1000
-        self.tamanho_dados = 10
-        self.banco_de_dados = []
+        self.tamanho_cartao = 10
+        self.memoria = {}
 
-    def inserir_cartao(self, cartao):
-        if len(cartao) != self.tamanho_dados:
-            print("Erro: Tamanho do cartão inválido.")
-            return
+    def ler_cartao(self, numero_cartao):
+        return self.memoria.get(numero_cartao, None)
 
-        if len(self.banco_de_dados) >= (self.fim_memoria - self.inicio_memoria) // self.tamanho_dados:
-            print("Erro: Memória cheia.")
-            return
+    def verificar_cartao_existe(self, numero_cartao):
+        return numero_cartao in self.memoria
 
-        if cartao in self.banco_de_dados:
-            print("Erro: Cartão já existente.")
-            return
+    def deletar_memoria(self):
+        self.memoria = {}
 
-        self.banco_de_dados.append(cartao)
-        print("Cartão inserido com sucesso.")
+    def adicionar_cartao(self, numero_cartao):
+        if self.verificar_cartao_existe(numero_cartao):
+            print(f"O cartão {numero_cartao} já está na memória.")
+        else:
+            if len(self.memoria) < (self.fim_memoria - self.inicio_memoria) / self.tamanho_cartao:
+                self.memoria[numero_cartao] = True
+                print(f"Cartão {numero_cartao} adicionado com sucesso.")
+            else:
+                print("Memória cheia, não é possível adicionar mais cartões.")
 
-    def consultar_cartoes(self):
-        print("Cartões no banco de dados:")
-        for cartao in self.banco_de_dados:
-            print(cartao)
+# Função para interagir com o usuário via terminal
+def menu_principal():
+    controle_acesso = ControleAcessoRFID()
 
-    def verificar_cartao(self, cartao):
-        return cartao in self.banco_de_dados
+    while True:
+        print("\n--- Controle de Acesso RFID ---")
+        print("1. Verificar cartão")
+        print("2. Adicionar cartão")
+        print("3. Deletar memória")
+        print("4. Sair")
+
+        escolha = input("Escolha uma opção: ")
+
+        if escolha == '1':
+            numero_cartao = input("Digite o número do cartão a ser verificado: ")
+            if controle_acesso.verificar_cartao_existe(numero_cartao):
+                print("Acesso permitido.")
+            else:
+                print("Acesso não permitido.")
+
+        elif escolha == '2':
+            numero_cartao = input("Digite o número do cartão a ser adicionado: ")
+            controle_acesso.adicionar_cartao(numero_cartao)
+
+        elif escolha == '3':
+            controle_acesso.deletar_memoria()
+            print("Memória de cartões deletada.")
+
+        elif escolha == '4':
+            break
+
+        else:
+            print("Opção inválida. Escolha novamente.")
+
+# Executar o menu principal
+menu_principal()
