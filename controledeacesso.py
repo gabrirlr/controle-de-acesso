@@ -1,9 +1,22 @@
 class ControleAcessoRFID:
-    def __init__(self):
+    def __init__(self, arquivo_memoria="memoria_rfid.txt"):
         self.inicio_memoria = 100
         self.fim_memoria = 1000
         self.tamanho_cartao = 10
-        self.memoria = {}
+        self.arquivo_memoria = arquivo_memoria
+        self.memoria = self.carregar_memoria()
+
+    def carregar_memoria(self):
+        try:
+            with open(self.arquivo_memoria, 'r') as file:
+                dados = file.read().splitlines()
+                return {cartao: True for cartao in dados}
+        except FileNotFoundError:
+            return {}
+
+    def salvar_memoria(self):
+        with open(self.arquivo_memoria, 'w') as file:
+            file.write('\n'.join(self.memoria.keys()))
 
     def ler_cartao(self, numero_cartao):
         return self.memoria.get(numero_cartao, None)
@@ -13,6 +26,8 @@ class ControleAcessoRFID:
 
     def deletar_memoria(self):
         self.memoria = {}
+        self.salvar_memoria()
+        print("Memória de cartões deletada.")
 
     def adicionar_cartao(self, numero_cartao):
         if self.verificar_cartao_existe(numero_cartao):
@@ -20,6 +35,7 @@ class ControleAcessoRFID:
         else:
             if len(self.memoria) < (self.fim_memoria - self.inicio_memoria) / self.tamanho_cartao:
                 self.memoria[numero_cartao] = True
+                self.salvar_memoria()
                 print(f"Cartão {numero_cartao} adicionado com sucesso.")
             else:
                 print("Memória cheia, não é possível adicionar mais cartões.")
@@ -50,7 +66,6 @@ def menu_principal():
 
         elif escolha == '3':
             controle_acesso.deletar_memoria()
-            print("Memória de cartões deletada.")
 
         elif escolha == '4':
             break
@@ -58,5 +73,8 @@ def menu_principal():
         else:
             print("Opção inválida. Escolha novamente.")
 
+    controle_acesso.salvar_memoria()  # Salvar novamente ao sair do programa
+
 # Executar o menu principal
 menu_principal()
+
