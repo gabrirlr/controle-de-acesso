@@ -40,7 +40,7 @@ class ControleAcessoRFID:
             else:
                 print("Memória cheia, não é possível adicionar mais cartões.")
 
-# Função para interagir com o usuário via terminal
+
 def menu_principal():
     controle_acesso = ControleAcessoRFID()
 
